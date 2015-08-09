@@ -30,6 +30,8 @@ function getNgNeosPaginationTemplate() {
 	return parentContainer.html();
 };
 
+var NG_NEOS_PAGINATION_TEMPLATE = getNgNeosPaginationTemplate();
+
 function neosPaginationLink($scope, elem, attr) {
 	
 };
@@ -41,7 +43,7 @@ _moduleNeosPagination.directive("ngNeosPagination", function() {
 			"pageObj": "=",
 		},
 		"link": neosPaginationLink,
-		"template": getNgNeosPaginationTemplate()
+		"template": processTemplate(NG_NEOS_PAGINATION_TEMPLATE)
 	}
 });
 

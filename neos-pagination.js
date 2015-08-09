@@ -7,9 +7,12 @@ _pagesExampleData = [
 	"f",
 	"g",
 	"h",
-	"g",
 	"j",
-	"i"
+	"i",
+	"k",
+	"l",
+	"m",
+	"n"
 ]
 var _NEOS_PAGINATION_ELEMENT_NAME = "neos-pagination";
 
@@ -26,8 +29,8 @@ function getNeosPaginationTemplate() {
 	
 	var pagesNav = $("<nav>"),
 		pagesContainer = $("<ul>", {"class": "pagination"}),
-		leftArrow = $("<li> <a href=\"javascript:void(0);\" ng-click=\"pageChange(pageObj.page - 1, $index)\" aria-label=\"Предыдущая\"> <span aria-hidden=\"true\">&laquo;</span></a></li>"),
-		pages = $("<li ng-repeat=\"pageNum in pageObj.pages\" ng-class=\"{'active': pageNum == pageObj.page}\" ng-if=\"getPage(pageNum)\"><a href=\"javascript:void(0);\" ng-click=\"pageChange(pageNum, $index)\">{{ getPage(pageNum) }}</a></li>");
+		leftArrow = $("<li> <a href=\"javascript:void(0);\"> <span>&laquo;</span></a></li>"),
+		pages = $("<li\"><a href=\"javascript:void(0);\"></a></li>");
 		rightArrow = $("<li ng-class=\"{'disabled': pageObj.next == null}\"><a href=\"javascript:void(0);\" ng-click=\"pageChange(pageObj.page + 1, $index)\" aria-label=\"Следующая\"><span aria-hidden=\"true\">&raquo;</span></a></li>");
 		
 	
@@ -38,7 +41,18 @@ function getNeosPaginationTemplate() {
 	rightArrow.appendTo(pagesContainer);
 	
 	return parentContainer.html();
-};	
+};
+
+var NEOS_PAGINATION_TEMPLATE = getNeosPaginationTemplate();
+
+function processTemplate(template) {
+	if (template instanceof $) {
+		var wrapper = $("<div>");
+		wrapper.append(template);
+		return wrapper.html();
+	};
+	return template;
+}
 	
 function _NeosPaginationOptions() {
 	var self = this;
@@ -236,12 +250,11 @@ function NeosPaginationManager() {
 	var self = this;
 	
 	self.setTemplate = function(element) {
-		
+		element.innerHTML = processTemplate(NEOS_PAGINATION_TEMPLATE);
 	};
 	
 	self.init = function() {
 		$(_NEOS_PAGINATION_ELEMENT_NAME).each(function(index, neosPaginationElement) {
-			console.log(neosPaginationElement);
 			self.setTemplate(neosPaginationElement);
 			
 			var options = new _NeosPaginationOptions();
