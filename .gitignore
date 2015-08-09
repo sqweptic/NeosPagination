@@ -1,0 +1,4 @@
+.*
+!.gitignore
+opop.js
+/example/libs/
