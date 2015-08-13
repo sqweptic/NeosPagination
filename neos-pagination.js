@@ -13,15 +13,21 @@ _pagesExampleData = [
 	"l",
 	"m",
 	"n"
-]
-var _NEOS_PAGINATION_ELEMENT_NAME = "neos-pagination";
+];
+var data = window["_pagesExampleData"]
+	pagesObj = {
+		"page": 1
+	}; 
 
+
+//(function() {
+var NEOS_PAGINATION_ELEMENT_NAME = "neos-pagination";
 
 function getNeosPaginationTemplate() {
 	var parentContainer = $("<div>"),
-		baseContainer = $("<div>", {"class": "pagination-container row"});
-		baseContainerPagesRow = $("<div>", {"class": "pagination-row pagination-row-pages"});
-		baseContainerPageEnterRow = $("<div>", {"class": "pagination-row pagination-row-page-enter"});
+		baseContainer = $("<div>", {"class": "neos-pagination-container"});
+		baseContainerPagesRow = $("<div>", {"class": "neos-pagination-row neos-pagination-row-pages"});
+		baseContainerPageEnterRow = $("<div>", {"class": "neos-pagination-row neos-pagination-row-page-enter"});
 		
 	baseContainer.appendTo(parentContainer);
 	baseContainerPagesRow.appendTo(baseContainer);
@@ -29,11 +35,10 @@ function getNeosPaginationTemplate() {
 	
 	var pagesNav = $("<nav>"),
 		pagesContainer = $("<ul>", {"class": "pagination"}),
-		leftArrow = $("<li> <a href=\"javascript:void(0);\"> <span>&laquo;</span></a></li>"),
-		pages = $("<li\"><a href=\"javascript:void(0);\"></a></li>");
-		rightArrow = $("<li ng-class=\"{'disabled': pageObj.next == null}\"><a href=\"javascript:void(0);\" ng-click=\"pageChange(pageObj.page + 1, $index)\" aria-label=\"Следующая\"><span aria-hidden=\"true\">&raquo;</span></a></li>");
+		leftArrow = $("<li class=\"neos-pagination-button neos-pagination-left-button\"> <a href=\"javascript:void(0)\"> <span>&laquo;</span></a></li>"),
+		pages = $("<li class=\"neos-pagination-button neos-pagination-page-button\"><a href=\"javascript:void(0)\"></a></li>");
+		rightArrow = $("<li class=\"neos-pagination-button neos-pagination-left-button\" class=\"\"><a href=\"javascript:void(0)\"><span>&raquo;</span></a></li>");
 		
-	
 	pagesNav.appendTo(baseContainerPagesRow);
 	pagesContainer.appendTo(pagesNav);
 	leftArrow.appendTo(pagesContainer);
@@ -54,31 +59,41 @@ function processTemplate(template) {
 	return template;
 }
 	
-function _NeosPaginationOptions() {
+function NeosPaginationOptions() {
 	var self = this;
+	
+	self.corrent = true;	
+	
 	self.pagesObject = {};
 	self.offset = 3;
 	self.pageRowCount = 10;
 	self.manualEventHandling = true;
+	self.dataLength = 0;
 };
 
-_NeosPaginationOptions.prototype.setManualEventHandling = function() {
+NeosPaginationOptions.prototype.setManualEventHandling = function() {
 	this.manualEventHandling = true;
 };
 
-
-/**
- * 
- */
-_NeosPaginationOptions.prototype.parseFromElement = function(element) {
+NeosPaginationOptions.prototype.parseFromElement = function(element) {
 	var self = this;
 	
-	function objectAttr(value) {self.pageObject = window[value] ? window[value] : {}};
+	function parsePageObject(value) {
+		self.pageObject = window[value] ? window[value] : {};
+	};
+	
+	function parseDataCount(value) {
+		if (typeof value == "string" || typeof value == "number") {
+			self.dataLength = value;
+		} else if (value.length) {
+			self.dataLength.length;
+		};
+	}
 	
 	var attributeOptionRelaton = {
-		"offset": "offset",
-		"page-object": objectAttr,
-		"rows-count": "pagesRowCount"
+		"page-object": parsePageObject,
+		"rows-count": "pagesRowCount",
+		"data": parseDataCount
 	};
 	
 	var attrs = element.attributes;
@@ -93,6 +108,10 @@ _NeosPaginationOptions.prototype.parseFromElement = function(element) {
 	
 };
 
+NeosPaginationOptions.prototype.isCorrent = function() {
+	return this.corrent;
+};
+
 function NeosPaginationEventHandler() {
 	
 };
@@ -101,8 +120,13 @@ function emptyOnPageChangeCallback() {
 	console.log("emptyOnPageChangeCallback");
 };
 
-function NeosPagination($scope, element, attrs) {
-	$scope.dataLoaded = false;
+function NeosPagination(baseElement, options) {
+	var self = this;
+	console.log(baseElement);
+	self.dataLoaded = false;
+	
+	//just ret
+	return;
 	
 	function getRowPerPageCount(attrs) {
 		var perPage = null;
@@ -254,12 +278,15 @@ function NeosPaginationManager() {
 	};
 	
 	self.init = function() {
-		$(_NEOS_PAGINATION_ELEMENT_NAME).each(function(index, neosPaginationElement) {
+		$(NEOS_PAGINATION_ELEMENT_NAME).each(function(index, neosPaginationElement) {
 			self.setTemplate(neosPaginationElement);
 			
-			var options = new _NeosPaginationOptions();
+			var options = new NeosPaginationOptions();
 			options.parseFromElement(neosPaginationElement);
 			options.setManualEventHandling();
+			if (options.isCorrent()) {
+				NeosPagination(neosPaginationElement, options)
+			};
 		});
 	};
 	
@@ -268,9 +295,5 @@ function NeosPaginationManager() {
 	});
 };
 
-var data = window["_pagesExampleData"]
-	pagesObj = {
-		"page": 1
-	}; 
-	
 new NeosPaginationManager();
+//})();
