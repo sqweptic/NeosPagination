@@ -68,7 +68,6 @@ function NeosPaginationOptions() {
 	self.offset = 3;
 	self.pageRowCount = 10;
 	self.manualEventHandling = true;
-	self.dataLength = 0;
 };
 
 NeosPaginationOptions.prototype.setManualEventHandling = function() {
@@ -79,21 +78,17 @@ NeosPaginationOptions.prototype.parseFromElement = function(element) {
 	var self = this;
 	
 	function parsePageObject(value) {
-		self.pageObject = window[value] ? window[value] : {};
+		self.pagesObject = window[value] ? window[value] : {};
 	};
 	
 	function parseDataCount(value) {
-		if (typeof value == "string" || typeof value == "number") {
-			self.dataLength = value;
-		} else if (value.length) {
-			self.dataLength.length;
-		};
+		self.data = value;
 	}
 	
 	var attributeOptionRelaton = {
 		"page-object": parsePageObject,
 		"rows-count": "pagesRowCount",
-		"data": parseDataCount
+		"data": "data"
 	};
 	
 	var attrs = element.attributes;
@@ -105,15 +100,80 @@ NeosPaginationOptions.prototype.parseFromElement = function(element) {
 				self[attributeOptionRelaton[attr.name]] = attr.value;
 		};
 	});
-	
 };
 
 NeosPaginationOptions.prototype.isCorrent = function() {
 	return this.corrent;
 };
 
+NeosPaginationOptions.prototype.getData = function() {
+//	if (this.pagesObject)
+	return [this.data, this.pagesObject.data];
+};
+
 function NeosPaginationEventHandler() {
+	var self = this;
 	
+	self.element = undefined;
+	self.pagination = undefined;
+	self.data = [];
+	
+	self.buttonCallback = 
+		self.leftButtonCallback = 
+		self.rightButtonCallback = 
+			function() {
+		
+			};
+};
+
+NeosPaginationEventHandler.prototype.setElement = function(baseElement) {
+	if (baseElement) 
+		this.element = baseElement;
+};
+
+NeosPaginationEventHandler.prototype.setPagination = function(pagination) {
+	if (pagination) 
+		this.pagination = pagination;
+};
+
+NeosPaginationEventHandler.prototype.setData = function(data) {
+	if (data && data.length > 0) 
+		this.data = data;
+};
+
+NeosPaginationEventHandler.prototype.checkValue = function() {
+	if (this.element && this.pagination && this.data.length) {
+		return true
+	};
+	return false;
+};
+
+NeosPaginationEventHandler.prototype.setOnClickCallbacks = function() {
+	var self = this;
+};
+
+NeosPaginationEventHandler.prototype.setForceUpdateCallback = function() {
+	var self = this;
+};
+
+NeosPaginationEventHandler.prototype.setButtonClickEvents = function() {
+	var self = this;
+};
+
+NeosPaginationEventHandler.prototype.setDataChangeWatcher = function() {
+	var self = this;
+};
+
+NeosPaginationEventHandler.prototype.on = function() {
+	var self = this;
+	
+	if (self.checkValue()) {
+		self.setOnClickCallbacks();
+		self.setForceUpdateCallback();
+		
+		self.setButtonClickEvents();
+		self.setDataChangeWatcher();
+	};
 };
 
 function emptyOnPageChangeCallback() {
@@ -285,7 +345,15 @@ function NeosPaginationManager() {
 			options.parseFromElement(neosPaginationElement);
 			options.setManualEventHandling();
 			if (options.isCorrent()) {
-				NeosPagination(neosPaginationElement, options)
+				var neosPaginationInstance = new NeosPagination(neosPaginationElement, options),
+					neosPaginationEventHandlerInstance = new NeosPaginationEventHandler();
+				
+//				neosPaginationInstance.
+				
+				neosPaginationEventHandlerInstance.setElement(neosPaginationElement);
+				neosPaginationEventHandlerInstance.setPagination(neosPaginationInstance);
+				neosPaginationEventHandlerInstance.setData(options.getData());
+				neosPaginationEventHandlerInstance.on();
 			};
 		});
 	};
